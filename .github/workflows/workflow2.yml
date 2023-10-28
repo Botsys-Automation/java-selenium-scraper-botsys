@@ -1,0 +1,33 @@
+name: ScrapeRedditExample
+
+on:
+  workflow_dispatch:
+
+env:
+  REDDIT_USERNAME: ${{ secrets.REDDIT_USERNAME }}
+  REDDIT_PASSWORD: ${{ secrets.REDDIT_PASSWORD }}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Set up JDK 1.11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          cache: maven
+
+      - uses: browser-actions/setup-chrome@latest
+      - run: chrome --version
+
+      - name: Build
+        run: mvn --batch-mode -DskipTests package
+
+      - name: RunGroup1
+        run: mvn --batch-mode clean test -Dgroups=group1 -Dsubreddits=CHANGEME -D"surefire.suiteXmlFiles"="src/test/resources/group1.xml"
